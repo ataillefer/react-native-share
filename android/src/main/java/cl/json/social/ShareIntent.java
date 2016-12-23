@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -35,27 +37,32 @@ public abstract class ShareIntent {
         if (ShareIntent.hasValidKey("message", options) && ShareIntent.hasValidKey("url", options)) {
             ShareFile fileShare = getFileShare(options);
             if(fileShare.isFile()) {
-                Uri uriFile = fileShare.getURI();
-                this.getIntent().setType(fileShare.getType());
-                this.getIntent().putExtra(Intent.EXTRA_STREAM, uriFile);
+                setIntentFile(fileShare, options);
                 this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message"));
-                this.getIntent().addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {
                 this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message") + " " + options.getString("url"));
             }
         } else if (ShareIntent.hasValidKey("url", options)) {
             ShareFile fileShare = getFileShare(options);
             if(fileShare.isFile()) {
-                Uri uriFile = fileShare.getURI();
-                this.getIntent().setType(fileShare.getType());
-                this.getIntent().putExtra(Intent.EXTRA_STREAM, uriFile);
-                this.getIntent().addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                setIntentFile(fileShare, options);
             } else {
                 this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("url"));
             }
         } else if (ShareIntent.hasValidKey("message", options) ) {
             this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message"));
         }
+    }
+    protected void setIntentFile(ShareFile fileShare, ReadableMap options) {
+        Uri uriFile = fileShare.getURI();
+        this.getIntent().setType(fileShare.getType());
+        if (ShareIntent.hasValidKey("androidURIAuthority", options)) {
+            File file = new File(uriFile.getPath());
+            uriFile = FileProvider.getUriForFile(reactContext.getCurrentActivity(),
+                    options.getString("androidURIAuthority"), file);
+        }
+        this.getIntent().putExtra(Intent.EXTRA_STREAM, uriFile);
+        this.getIntent().addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
     }
     protected ShareFile getFileShare(ReadableMap options) {
         if (ShareIntent.hasValidKey("type", options)) {

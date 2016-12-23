@@ -62,6 +62,7 @@ Supported options:
 | :---- | :------: | :--- |
 | url | string   | URL you want to share (you can share a base64 file url only in iOS & Android ) |
 | type | string   | File mime type (optional) |
+| androidURIAuthority | string   | Android [FileProvider](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) URI authority (optional, required to share a file on Android 7.x) |
 | message | string   |  |
 | title | string   |  (optional) |
 | subject | string   | (optional) |
@@ -77,6 +78,7 @@ Supported options:
 | :---- | :------: | :--- |
 | url | string   | URL you want to share |
 | type | string   | File mime type (optional) |
+| androidURIAuthority | string   | Android [FileProvider](https://developer.android.com/reference/android/support/v4/content/FileProvider.html) URI authority (optional, required to share a file on Android 7.x) |
 | message | string   |  |
 | title | string   |  (optional) |
 | subject | string   | (optional) |
